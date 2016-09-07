@@ -44,7 +44,6 @@ class Switcher {
         let promise = new Promise(resolve => resolve());
         for (let result of results) {
             if (result instanceof Switcher) {
-                args = this.mounting(...args);
                 promise = result.dispatch(...args);
             }
             else {
@@ -59,9 +58,6 @@ class Switcher {
     match (condition, ...args) {
         const target = args[0];
         return target === condition;
-    }
-    mounting (...args) {
-        return args;
     }
     execute (result, ...args) {
         debug('executing ...');
