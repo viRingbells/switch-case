@@ -1,7 +1,7 @@
 # switch-case
 switcher for complex conditions
 
-[![NPM version](https://img.shields.io/npm/v/lark-log.svg)](https://www.npmjs.com/package/switch-case)
+[![NPM version](https://img.shields.io/npm/v/switch-case.svg)](https://www.npmjs.com/package/switch-case)
 [![Build Status](https://travis-ci.org/viRingbells/switch-case.svg?branch=master)](https://travis-ci.org/viRingbells/switch-case)
 
 ## How to use
