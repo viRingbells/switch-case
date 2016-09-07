@@ -33,14 +33,7 @@ class Switcher {
         for (const _case of this._cases) {
             if (this.match($.cloneDeep(_case.condition), ...args)) {
                 debug('condition matched!');
-                let result = _case.result;
-                if (result instanceof Switcher) {
-                    result = result.switch(...args);
-                    results.push(...result);
-                }
-                else {
-                    results.push(result);
-                }
+                results.push(_case.result);
             }
         }
         return results;
@@ -50,9 +43,15 @@ class Switcher {
         const results = this.switch(...args);
         let promise = new Promise(resolve => resolve());
         for (let result of results) {
-            promise = promise.then(() => {
-                return this.execute(result, ...args);
-            });
+            if (result instanceof Switcher) {
+                args = this.mounting(...args);
+                promise = result.dispatch(...args);
+            }
+            else {
+                promise = promise.then(() => {
+                    return this.execute(result, ...args);
+                });
+            }
         }
         return promise;
     }
@@ -60,6 +59,9 @@ class Switcher {
     match (condition, ...args) {
         const target = args[0];
         return target === condition;
+    }
+    mounting (...args) {
+        return args;
     }
     execute (result, ...args) {
         debug('executing ...');
