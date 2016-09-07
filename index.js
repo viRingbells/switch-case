@@ -24,6 +24,7 @@ class Switcher extends EventEmitter {
         assert(undefined !== condition, 'Condition should not be undefined!');
         assert(Array.isArray(this._cases), 'Internal Error, [Switcher] switcher._cases should be an Array!');
         this._cases.push({ condition, result });
+        return this;
     }
     /**
      * Switch the target, returns the list of results
