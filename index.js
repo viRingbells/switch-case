@@ -7,13 +7,10 @@ const $       = require('lodash');
 const debug   = require('debug')('switch-case');
 const assert  = require('assert');
 
-const EventEmitter  = require('events').EventEmitter;
-
 debug('loading ...');
 
-class Switcher extends EventEmitter {
+class Switcher {
     constructor () {
-        super();
         this._cases = [];
     }
     /**
