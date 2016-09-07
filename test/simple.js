@@ -3,9 +3,11 @@
  **/
 'use strict';
 
-const debug   = require('debug')('lark-switcher.test.simple');
+const debug   = require('debug')('switch-case.test.simple');
 
 const Switcher  = require('..');
+
+debug('loading ...');
 
 describe('lark-switcher instance', () => {
     const switcher = new Switcher();
@@ -34,7 +36,9 @@ describe('lark-switcher instance', () => {
         const taskList = [];
         for (let num of testList) taskList.push(switcher.dispatch(num));
 
+        debug('start to handle async processros ...');
         Promise.all(taskList).then(() => {
+            debug('async processors done!');
             output.should.have.property('length', testList.length);
             for (let i = 0; i < testList.length; i++) {
                 output[i].should.be.exactly(testList[i]);
@@ -68,3 +72,5 @@ describe('lark-switcher instance', () => {
         }).catch(e => console.log(e.stack));
     });
 });
+
+debug('loaded!');
