@@ -1,0 +1,36 @@
+{
+  "name": "switch-case",
+  "version": "0.1.0",
+  "description": "An advanced cases switcher for complex conditions",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "istanbul cover ./node_modules/.bin/_mocha -- --require should --recursive test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viRingbells/switch-case.git"
+  },
+  "keywords": [
+    "switch",
+    "switcher"
+  ],
+  "author": "Sun Haohao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/viRingbells/switch-case/issues"
+  },
+  "homepage": "https://github.com/viRingbells/switch-case#readme",
+  "dependencies": {
+    "debug": "^2.2.0",
+    "lodash": "^4.15.0"
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.5",
+    "mocha": "^3.0.2",
+    "should": "^11.1.0"
+  }
+}
