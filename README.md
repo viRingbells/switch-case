@@ -23,7 +23,7 @@ switcher.dispatch(2); // ===> print "2"
 
 ## When to use switch-case
 
-If you know every cases you are going to handle, use the native statement `switch(..) { case ... }`. 
+If you know every case you are going to handle, use the native statement `switch(..) { case ... }`. 
 In other cases, use this to set case automaticaly:
 
 ```javascript
