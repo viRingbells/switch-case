@@ -33,7 +33,7 @@ In other cases, use this to set case automaticaly:
 const cases = getTheRandomCases();
 cases.forEach(case => switcher.case(case.condition, case.result));
 
-switcher.dispatch(...);
+switcher.dispatch(...).then(() => { ... });
 ```
 
 ## async handlers
