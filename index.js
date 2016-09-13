@@ -41,7 +41,12 @@ class Switcher {
         let promise = new Promise((resolve, reject) => resolve());
         const o = {};
         for (const caseItem of this._cases) {
-            promise = promise.then(() => this._process(o, caseItem, ...args));
+            if (this.sync === true) {
+                this._process(o, caseItem, ...args);
+            }
+            else {
+                promise = promise.then(() => this._process(o, caseItem, ...args));
+            }
         }
         return promise;
     }
