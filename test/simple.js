@@ -24,7 +24,7 @@ describe('lark-switcher instance', () => {
 
     it('should add routing rules', done => {
         const output = [];
-        const handler = num => { output.push(num); };
+        const handler = num => new Promise(resolve => { output.push(num); resolve(); });
         switcher.case(1, handler);
         switcher.case(2, handler);
         switcher.case(3, handler);
@@ -58,6 +58,7 @@ describe('lark-switcher instance', () => {
             const result = condition.toString() === target.toString()[0];
             return result;
         };
+        main.sync = true;
 
         main.proxy = (target) => {
             return target % 10;

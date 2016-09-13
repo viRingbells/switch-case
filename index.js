@@ -38,17 +38,17 @@ class Switcher {
      **/
     dispatch (...args) {
         debug('dispatching ...');
-        let promise = new Promise((resolve, reject) => resolve());
+        let promise = null;
         const o = {};
         for (const caseItem of this._cases) {
-            if (this.sync === true) {
-                this._process(o, caseItem, ...args);
-            }
-            else {
+            if (promise instanceof Promise) {
                 promise = promise.then(() => this._process(o, caseItem, ...args));
             }
+            else {
+                promise = this._process(o, caseItem, ...args);
+            }
         }
-        return promise;
+        return promise instanceof Promise ? promise : new Promise(resolve => resolve(promise));
     }
     /**
      * Process for each case
