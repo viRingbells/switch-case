@@ -1,6 +1,6 @@
 {
   "name": "switch-case",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "An advanced cases switcher for complex conditions",
   "main": "index.js",
   "directories": {
@@ -26,6 +26,7 @@
   "homepage": "https://github.com/viRingbells/switch-case#readme",
   "dependencies": {
     "debug": "^2.2.0",
+    "extend": "^3.0.0",
     "lodash": "^4.15.0"
   },
   "devDependencies": {

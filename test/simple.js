@@ -33,11 +33,12 @@ describe('lark-switcher instance', () => {
         switcher.case(6, handler);
 
         const testList = [4, 3, 2, 6, 5, 4, 3, 2, 1];
-        const taskList = [];
-        for (let num of testList) taskList.push(switcher.dispatch(num));
 
         debug('start to handle async processros ...');
-        Promise.all(taskList).then(() => {
+        let promise = new Promise(resolve => resolve());
+        for (let num of testList) promise = promise.then(() => switcher.dispatch(num));
+
+        promise.then(() => {
             debug('async processors done!');
             output.should.have.property('length', testList.length);
             for (let i = 0; i < testList.length; i++) {
@@ -45,31 +46,42 @@ describe('lark-switcher instance', () => {
             }
 
             done();
-        });
+        }).catch(e => console.log(e.stack));
     });
 
     it('should proxy to mounting switchers', done => {
         const main = new Switcher();
         const sub  = new Switcher();
+        const another = new Switcher();
 
-        main.match = (condition, target) => {
-            return parseInt(target / 10, 10) === condition;
+        main.match = sub.match = (condition, target) => {
+            const result = condition.toString() === target.toString()[0];
+            return result;
         };
 
-        sub.match = (condition, target) => {
-            return parseInt(target % 10, 10) === condition;
-        };
+        main.proxy = (target) => {
+            return target % 10;
+        }
 
         let output = 0;
+        let anotherOutput = 0;
 
         main.case(1, sub);
+        another.case(3, sub);
+
         sub.case(1, () => { output = 1; });
         sub.case(2, () => { output = 2; });
+        sub.case(3, () => { anotherOutput = 3; });
+        sub.case(4, () => { anotherOutput = 4; });
 
-        main.dispatch(12).then(() => {
+        main.switch(12).then(() => {
             output.should.be.exactly(2);
-            done();
-        }).catch(e => console.log(e.stack));
+        }).then(() => {
+            another.switch(3).then(() => {
+                anotherOutput.should.be.exactly(3);
+                done();
+            }).catch(e => console.log(e.stack));
+        });
     });
 });
 
