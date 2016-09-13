@@ -20,8 +20,10 @@ switcher
     //todo with case 2
 });
 
-switcher.dispatch(1); // ===> print "1"
+switcher.switch(1); // ===> print "1"
 switcher.dispatch(2); // ===> print "2"
+
+// Note that switch/dispatch runs in a async way by default, use .then() to dispatch one by one in order.
 ```
 
 ## When to use switch-case
@@ -33,7 +35,7 @@ In other cases, use this to set case automaticaly:
 const cases = getTheRandomCases();
 cases.forEach(case => switcher.case(case.condition, case.result));
 
-switcher.dispatch(...).then(() => { ... });
+switcher.dispatch(...);
 ```
 
 ## async handlers
@@ -73,9 +75,32 @@ router.case('/bar', (req, res) => res.end('bar'));
 http.createServer(router.dispatch).listen(3000);
 ```
 
-## DOCS
+## API
 
-API (TBD...)
+#### switcher.case(condition, result, options = {})
+
+Set a case. Then match condition is `condition` and result is `result`. If matched, `switcher.execute(result, ...input)` will be executed. If `result` is a switcher, the input will be deilvered to `result.dispatch()`, just after `input = switcher.proxy(...input)` called for that proxying.
+For options, if `options.break` is set true and that case matches, all cases set after that case will be ignored.
+
+#### switcher.switch(...input) / switcher.dispatch(...input)
+
+Start to dispatch that input for every case. If a condition is matched, the corresponding case result will be hanled.
+
+#### swticher.prepare(...input) @overwrite
+
+Prepare before each case start to test. The returning result should be an array and will replace input for matching and executing logics. You should overwrite this for your own use.
+
+#### switcher.proxy(...input) @overwrite
+
+Process the input before proxying. The returning result should be an array and will replace the input for the proxy switcher. You should overwrite this for your own use.
+
+#### switcher.match(condition, ...input) @overwrite
+
+Test if a condition matches the input, should return a boolean. You should overwrite this for your own use.
+
+#### switcher.execte(result, ...input) @overwrite
+
+Execute the result. If the executing is async, return a promise. You should overwrite this for your own use.
 
 ## LICENCE
 MIT
