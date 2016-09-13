@@ -22,8 +22,6 @@ switcher
 
 switcher.switch(1); // ===> print "1"
 switcher.dispatch(2); // ===> print "2"
-
-// Note that switch/dispatch runs in a async way by default, use .then() to dispatch one by one in order.
 ```
 
 ## When to use switch-case
@@ -56,26 +54,9 @@ You can mount a switcher on another.
 switcher.case(1, anotherSwitcher);
 ```
 
-## extend
-
-You can extend switcher for complex uses.
-
-```javascript
-class Router extend Switcher {
-    //@overwrite
-    match (condition, req, res) {
-        return condition === req.url.split('?')[0];
-    }
-}
-
-const router = new Router();
-router.case('/foo', (req, res) => res.end('foo'));
-router.case('/bar', (req, res) => res.end('bar'));
-
-http.createServer(router.dispatch).listen(3000);
-```
-
 ## API
+
+### use
 
 #### switcher.case(condition, result, options = {})
 
@@ -85,6 +66,10 @@ For options, if `options.break` is set true and that case matches, all cases set
 #### switcher.switch(...input) / switcher.dispatch(...input)
 
 Start to dispatch that input for every case. If a condition is matched, the corresponding case result will be hanled.
+
+### overwrite
+
+You can overwite the following methods to customize the switcher
 
 #### swticher.prepare(...input) @overwrite
 
@@ -101,6 +86,10 @@ Test if a condition matches the input, should return a boolean. You should overw
 #### switcher.execte(result, ...input) @overwrite
 
 Execute the result. If the executing is async, return a promise. You should overwrite this for your own use.
+
+## extend switcher into a router
+
+see [lark-router](https://github.com/larkjs/lark-router)
 
 ## LICENCE
 MIT
