@@ -49,11 +49,12 @@ class Switcher {
                     promise = this._process(o, caseItem, ...args);
                 }
                 catch (error) {
-                    return new Promise((resolve, reject) => reject(error));
+                    promise = new Promise((resolve, reject) => reject(error));
                 }
             }
         }
-        return promise instanceof Promise ? promise : new Promise(resolve => resolve(promise));
+        promise = promise instanceof Promise ? promise : new Promise(resolve => resolve(promise));
+        return promise;
     }
     /**
      * Process for each case
@@ -108,7 +109,7 @@ class Switcher {
     }
     nesting (...args) {
         debug('proxying ...');
-        return args;
+        return;
     }
     execute (result, ...args) {
         debug('executing ...');

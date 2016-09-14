@@ -49,7 +49,7 @@ describe('lark-switcher instance', () => {
         }).catch(e => console.log(e.stack));
     });
 
-    it('should proxy to mounting switchers', done => {
+    it('should proxy to nesting switchers', done => {
         const main = new Switcher();
         const sub  = new Switcher();
         const another = new Switcher();
@@ -58,14 +58,14 @@ describe('lark-switcher instance', () => {
             const result = condition.toString() === target.toString()[0];
             return result;
         };
-        main.sync = true;
 
-        main.proxy = (target) => {
+        main.nesting = (target) => {
             return target % 10;
         }
 
         let output = 0;
         let anotherOutput = 0;
+        let another2Output = 0;
 
         main.case(1, sub);
         another.case(3, sub);
@@ -82,6 +82,20 @@ describe('lark-switcher instance', () => {
                 anotherOutput.should.be.exactly(3);
                 done();
             }).catch(e => console.log(e.stack));
+        });
+    });
+
+    it('should reject when error comes', done => {
+        const switcher = new Switcher();
+
+        switcher.case(1, () => {
+            throw new Error('Faked Error!');
+        });
+
+        switcher.dispatch(1).catch(error => {
+            error.should.be.an.instanceOf(Error);
+            error.should.have.ownProperty('message', 'Faked Error!');
+            done();
         });
     });
 });
