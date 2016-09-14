@@ -83,8 +83,8 @@ class Switcher {
         debug('internal executing ...');
         const result = caseItem.result;
         if (result instanceof Switcher) {
-            debug('result is another switcher, will proxy the condition to it ...');
-            args = this.proxy(...args);
+            debug('nested switcher ...');
+            args = this.nesting(...args) || args;
             if (!Array.isArray(args)) args = [args];
             return result.dispatch(...args);
         }
@@ -101,7 +101,7 @@ class Switcher {
         const target = args[0];
         return target === condition;
     }
-    proxy (...args) {
+    nesting (...args) {
         debug('proxying ...');
         return args;
     }

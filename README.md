@@ -46,9 +46,9 @@ switcher.case(1, () => new Promise((resolve, reject) => {
 });
 ```
 
-## mounting/proxing switchers
+## nested switchers
 
-You can mount a switcher on another.
+You can nest a switcher on another.
 
 ```javascript
 switcher.case(1, anotherSwitcher);
@@ -60,7 +60,7 @@ switcher.case(1, anotherSwitcher);
 
 #### switcher.case(condition, result, options = {})
 
-Set a case. Then match condition is `condition` and result is `result`. If matched, `switcher.execute(result, ...input)` will be executed. If `result` is a switcher, the input will be deilvered to `result.dispatch()`, just after `input = switcher.proxy(...input)` called for that proxying.
+Set a case. Then match condition is `condition` and result is `result`. If matched, `switcher.execute(result, ...input)` will be executed. If `result` is a switcher, the input will be deilvered to `result.dispatch()`, just after `input = switcher.nesting(...input)` called before the nested switcher starts to work.
 For options, if `options.break` is set true and that case matches, all cases set after that case will be ignored.
 
 #### switcher.switch(...input) / switcher.dispatch(...input)
@@ -75,9 +75,9 @@ You can overwite the following methods to customize the switcher
 
 Prepare before each case start to test. The returning result should be an array and will replace input for matching and executing logics. You should overwrite this for your own use.
 
-#### switcher.proxy(...input) @overwrite
+#### switcher.nesting(...input) @overwrite
 
-Process the input before proxying. The returning result should be an array and will replace the input for the proxy switcher. You should overwrite this for your own use.
+Process the input before nested switcher starts to work. The returning result should be an array and will replace the input for the nested switcher. You should overwrite this for your own use.
 
 #### switcher.match(condition, ...input) @overwrite
 
