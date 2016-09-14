@@ -45,7 +45,12 @@ class Switcher {
                 promise = promise.then(() => this._process(o, caseItem, ...args));
             }
             else {
-                promise = this._process(o, caseItem, ...args);
+                try {
+                    promise = this._process(o, caseItem, ...args);
+                }
+                catch (error) {
+                    return new Promise((resolve, reject) => reject(error));
+                }
             }
         }
         return promise instanceof Promise ? promise : new Promise(resolve => resolve(promise));
