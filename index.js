@@ -1,126 +1,96 @@
 /**
- * Switcher
+ * A Switcher
  **/
 'use strict';
 
-const $       = require('lodash');
-const debug   = require('debug')('switch-case');
-const assert  = require('assert');
 const extend  = require('extend');
 
-debug('loading ...');
-
 class Switcher {
-    constructor () {
-        this._cases = [];
+    constructor(options = {}) {
+        this.caseEntry = null;
+        this.caseTail = null;
     }
-    /**
-     * Set the case condition and result
-     **/
-    case (condition, result, options = {}) {
-        debug('setting case ...');
-        assert(undefined !== condition, 'Condition should not be undefined!');
-        assert(Array.isArray(this._cases), 'Internal Error, [Switcher] switcher._cases should be an Array!');
+    case(condition, action, options = {}) {
+        let defaultOptions = {
+            break: true,
+        };
         options = extend(true, defaultOptions, options);
-        if (result instanceof Switcher) options.break = false;
-        this._cases.push({ condition, result, options });
+        if (action instanceof Switcher) options.break = false;
+        let switchCase = new SwitchCase({ condition, action, options, switcher: this });
+        this.caseEntry = this.caseEntry || switchCase;
+        if (this.caseTail instanceof SwitchCase) {
+            this.caseTail.nextCase = switchCase;
+        }
+        this.caseTail = switchCase;
         return this;
     }
-    /**
-     * Switch the cases
-     **/
-    switch (...args) {
-        debug('switching ...');
+    switch(...args) {
         return this.dispatch(...args);
     }
-    /**
-     * Dispatch the args to all cases
-     **/
-    dispatch (...args) {
-        debug('dispatching ...');
-        let promise = null;
-        const o = {};
-        for (const caseItem of this._cases) {
-            if (promise instanceof Promise) {
-                promise = promise.then(() => this._process(o, caseItem, ...args));
-            }
-            else {
-                try {
-                    promise = this._process(o, caseItem, ...args);
-                }
-                catch (error) {
-                    promise = new Promise((resolve, reject) => reject(error));
-                }
-            }
+    dispatch(...args) {
+        if (!(this.caseEntry instanceof SwitchCase)) {
+            return Promise.resolve();
         }
-        promise = promise instanceof Promise ? promise : new Promise(resolve => resolve(promise));
-        return promise;
-    }
-    /**
-     * Process for each case
-     **/
-    _process (o, caseItem, ...args) {
-        debug('internal processing ...');
-        args = this.prepare(...args);
-        return !this._match(o, caseItem, ...args) || this._execute(o, caseItem, ...args);
-    }
-    /**
-     * Test if the case matches
-     **/
-    _match (o, caseItem, ...args) {
-        if (o.break) return false;
-        debug('internal matching ...');
-        assert(this.match instanceof Function, 'Switcher\' matching tester should be a Function');
-        if (!this.match($.cloneDeep(caseItem.condition), ...args)) {
-            debug('NOT MATCH!');
-            return false;
-        }
-        debug('MATCH!');
-        if (caseItem.options.break) {
-            debug('BREAK!');
-            o.break = true;
-        }
-        return true;
-    }
-    /**
-     * Execute the handlers
-     **/
-    _execute (o, caseItem, ...args) {
-        debug('internal executing ...');
-        const result = caseItem.result;
-        if (result instanceof Switcher) {
-            debug('nested switcher ...');
-            args = this.nesting(...args) || args;
-            if (!Array.isArray(args)) args = [args];
-            return result.dispatch(...args);
-        }
-        assert(this.execute instanceof Function, 'Switcher\' executing handler should be a Function');
-        return this.execute(result, ...args);
+        return this.caseEntry.dispatch(...args);
     }
     //=================adapters===================//
-    prepare (...args) {
-        debug('preparing ...');
-        return args;
+    match(condition, ...args) {
+        return condition === args[0];
     }
-    match (condition, ...args) {
-        debug('matching ...');
-        const target = args[0];
-        return target === condition;
+    execute(action, ...args) {
+        return action(...args);
     }
-    nesting (...args) {
-        debug('proxying ...');
+    nesting(...args) {
         return;
-    }
-    execute (result, ...args) {
-        debug('executing ...');
-        assert(result instanceof Function, 'Result to execute should be a Function');
-        return result(...args);
     }
 }
 
-const defaultOptions = {
-    break: true,
-};
+class SwitchCase {
+    constructor(caseItem) {
+        this.condition = caseItem.condition;
+        this.action = caseItem.action;
+        this.options = caseItem.options;
+        this.switcher = caseItem.switcher;
+    }
+    next(...args) {
+        if (!(this.nextCase instanceof SwitchCase)) {
+            return Promise.resolve();
+        }
+        return this.nextCase.dispatch(...args);
+    }
+    dispatch(...args) {
+        if (!this.switcher.match(this.condition, ...args)) {
+            return this.next(...args);
+        }
+        let result;
+        if (this.action instanceof Switcher) {
+            let tempArgs = this.switcher.nesting(...args);
+            args = Array.isArray(tempArgs) ? tempArgs : args;
+            result = this.action.dispatch(...args);
+        }
+        else {
+            try {
+                result = this.switcher.execute(this.action, ...args);
+            }
+            catch (error) {
+                return Promise.reject(error);
+            }
+        }
+        if (result instanceof Promise) {
+            return result.then((result) => {
+                return this.result(result, ...args);
+            });
+        }
+        return this.result(result, ...args);
+    }
+    result(result, ...args) {
+        if (this.options.break) {
+            return;
+        }
+        return this.next(...args);
+    }
+}
+
+Switcher.Case = SwitchCase;
 
 module.exports = Switcher;
-debug('loaded');

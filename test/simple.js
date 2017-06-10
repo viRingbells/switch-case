@@ -13,7 +13,8 @@ describe('lark-switcher instance', () => {
     const switcher = new Switcher();
 
     it('should be an object with case methods', done => {
-        switcher.should.have.property('_cases').which.is.an.instanceOf(Array);
+        switcher.should.have.property('caseEntry').which.is.exactly(null);
+        switcher.should.have.property('caseTail').which.is.exactly(null);
         switcher.should.have.property('case').which.is.an.instanceOf(Function).with.lengthOf(2);
         switcher.should.have.property('switch').which.is.an.instanceOf(Function);
         switcher.should.have.property('dispatch').which.is.an.instanceOf(Function);
@@ -32,6 +33,9 @@ describe('lark-switcher instance', () => {
         switcher.case(5, handler);
         switcher.case(6, handler);
 
+        switcher.should.have.property('caseEntry').which.is.an.instanceOf(Switcher.Case);
+        switcher.should.have.property('caseTail').which.is.an.instanceOf(Switcher.Case);
+
         const testList = [4, 3, 2, 6, 5, 4, 3, 2, 1];
 
         debug('start to handle async processros ...');
@@ -49,7 +53,7 @@ describe('lark-switcher instance', () => {
         }).catch(e => console.log(e.stack));
     });
 
-    it('should proxy to nesting switchers', done => {
+    it('should proxy to nesting switchers', async () => {
         const main = new Switcher();
         const sub  = new Switcher();
         const another = new Switcher();
@@ -60,7 +64,7 @@ describe('lark-switcher instance', () => {
         };
 
         main.nesting = (target) => {
-            return target % 10;
+            return [target % 10];
         }
 
         let output = 0;
@@ -75,14 +79,11 @@ describe('lark-switcher instance', () => {
         sub.case(3, () => { anotherOutput = 3; });
         sub.case(4, () => { anotherOutput = 4; });
 
-        main.switch(12).then(() => {
-            output.should.be.exactly(2);
-        }).then(() => {
-            another.switch(3).then(() => {
-                anotherOutput.should.be.exactly(3);
-                done();
-            }).catch(e => console.log(e.stack));
-        });
+        await main.switch(12);
+        output.should.be.exactly(2);
+
+        await another.switch(3);
+        anotherOutput.should.be.exactly(3);
     });
 
     it('should reject when error comes', done => {
@@ -97,6 +98,11 @@ describe('lark-switcher instance', () => {
             error.should.have.ownProperty('message', 'Faked Error!');
             done();
         });
+    });
+
+    it('should do noting if no case set', async () => {
+        const switcher = new Switcher();
+        await switcher.dispatch(1);
     });
 });
 
