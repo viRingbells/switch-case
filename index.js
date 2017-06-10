@@ -64,9 +64,9 @@ class SwitchCase {
         }
         let result;
         if (this.action instanceof Switcher) {
-            let tempArgs = this.switcher.nesting(...args);
-            args = Array.isArray(tempArgs) ? tempArgs : args;
-            result = this.action.dispatch(...args);
+            let nestingArgs = this.switcher.nesting(...args);
+            nestingArgs = Array.isArray(nestingArgs) ? nestingArgs : args;
+            result = this.action.dispatch(...nestingArgs);
         }
         else {
             try {
