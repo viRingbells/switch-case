@@ -46,46 +46,39 @@ switcher.case(1, () => new Promise((resolve, reject) => {
 });
 ```
 
-## nested switchers
+## Custom proxy
 
-You can nest a switcher on another.
+You can change the behavior by providing a proxy:
 
-```javascript
-switcher.case(1, anotherSwitcher);
+```
+const switcher = new Switcher(proxy);
 ```
 
-## API
+While these properties as expected in the proxy:
 
-### use
+### proxy.match(targetCondition, condition)
 
-#### switcher.case(condition, result, options = {})
+Checks if the target condition passed by switcher.switch matched the case condition. If true returned, the result will be executed.
 
-Set a case. Then match condition is `condition` and result is `result`. If matched, `switcher.execute(result, ...input)` will be executed. If `result` is a switcher, the input will be deilvered to `result.dispatch()`, just after `input = switcher.nesting(...input)` called before the nested switcher starts to work.
-For options, if `options.break` is set true and that case matches, all cases set after that case will be ignored.
+### proxy.execute(result, targetCondition) 
 
-#### switcher.switch(...input) / switcher.dispatch(...input)
+Executes the result with the target condition as a param.
 
-Start to dispatch that input for every case. If a condition is matched, the corresponding case result will be hanled.
+### proxy.validateCondition(condition)
 
-### overwrite
+Check if the condition is valid. If not, an error will be thrown.
 
-You can overwite the following methods to customize the switcher
+### proxy.validateResult(result)
 
-#### swticher.prepare(...input) @overwrite
+Check if the result is valid. If not, an error will be thrown.
 
-Prepare before each case start to test. The returning result should be an array and will replace input for matching and executing logics. You should overwrite this for your own use.
+### proxy.createIndex(condition, index, indexTable)
 
-#### switcher.nesting(...input) @overwrite
+Create an index on the condition, and store it on the index table.
 
-Process the input before nested switcher starts to work. The returning result should be an array and will replace the input for the nested switcher. You should overwrite this for your own use.
+### proxy.searchIndex(condition, indexTable)
 
-#### switcher.match(condition, ...input) @overwrite
-
-Test if a condition matches the input, should return a boolean. You should overwrite this for your own use.
-
-#### switcher.execte(result, ...input) @overwrite
-
-Execute the result. If the executing is async, return a promise. You should overwrite this for your own use.
+Search an index from the index table. Should return the index number list. If false returned, means index not found, the switcher will scan all cases to match.
 
 ## extend switcher into a router
 
