@@ -12,6 +12,7 @@ let matched = false;
 let caseList = null;
 let caseResult = null;
 let result = null;
+let indexList = null;
 
 class Switcher {
     static get BREAK() { return BREAK; }
@@ -77,9 +78,12 @@ class Switcher {
             return this._caseList;
         }
         const caseList = new Set();
-        (this.proxy.searchIndex(targetCondition, this._indexTable) || [])
-            .forEach(index => caseList.add(this._caseList[index]));
-        return [...caseList.values()];
+        indexList = this.proxy.searchIndex(targetCondition, this._indexTable);
+        if (Array.isArray(indexList)) {
+            indexList.forEach(index => caseList.add(this._caseList[index]));
+            return [...caseList.values()];
+        }
+        return this._caseList;
     }
     _match(targetCondition, condition) {
         debug('testing match');
