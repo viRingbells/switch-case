@@ -11,6 +11,7 @@ const BREAK = 'BREAK';
 let matched = false;
 let caseList = null;
 let caseResult = null;
+let caseContext = null;
 let result = null;
 let indexList = null;
 
@@ -29,9 +30,11 @@ class Switcher {
     switch(targetCondition) {
         debug('switch');
         caseList = this._searchIndexCaseList(targetCondition)
-            .filter(({ condition }) => this._match(targetCondition, condition))
-            .map(({ result }) => result);
-        caseList = caseList.length === 0 ? this._defaultCaseList : caseList;
+            .map(({ condition, result }) => { return { condition, result, context: {}}; })
+            .filter(({ condition, context }) => this._match(targetCondition, condition, context))
+            .map(({ result, context }) => { return { result, context }; });
+        caseList = caseList.length === 0 ?
+            this._defaultCaseList.map(result => { return { result, context: {}}; }) : caseList;
         return this._execute(targetCondition, caseList);
     }
     case(...conditions) {
@@ -85,13 +88,13 @@ class Switcher {
         }
         return this._caseList;
     }
-    _match(targetCondition, condition) {
+    _match(targetCondition, condition, context) {
         debug('testing match');
         if (!(this.proxy.match instanceof Function)) {
             matched = targetCondition === condition;
         }
         else {
-            matched = this.proxy.match(targetCondition, condition);
+            matched = this.proxy.match(targetCondition, condition, context);
         }
         debug(matched ? 'matched' : 'not matched');
         return matched;
@@ -101,13 +104,14 @@ class Switcher {
             return;
         }
         debug('executing');
-        caseResult = caseList[index];
+        caseResult = caseList[index].result;
+        caseContext = caseList[index].context;
         if (!(this.proxy.execute instanceof Function)) {
             assert(caseResult instanceof Function, 'Case action should be a function');
             result = caseResult(targetCondition);
         }
         else {
-            result = this.proxy.execute(caseResult, targetCondition);
+            result = this.proxy.execute(caseResult, targetCondition, caseContext);
         }
         if (result instanceof Promise) {
             return result.then(result => {

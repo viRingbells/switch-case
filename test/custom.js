@@ -4,7 +4,24 @@ const assert    = require('assert');
 const Switcher  = require('switch-case');
 
 const range = new Switcher({
-    match(age, teen) {
+    match(age, teen, context) {
+        switch (true) {
+            case age > 0:
+                context.description = 'baby';
+                break;
+            case age > 2:
+                context.description = 'boy';
+                break;
+            case age > 16:
+                context.description = 'young man';
+                break;
+            case age > 22:
+                context.description = 'man';
+                break;
+            case age > 60:
+                context.description = 'old man';
+                break;
+        }
         return age >= teen && (teen >= 100 || age <= teen + 9);
     },
     createIndex(teen, index, indexTable) {
@@ -26,16 +43,16 @@ const range = new Switcher({
         assert(result instanceof Function, 'result should be a function');
         return true;
     },
-    execute(result, targetCondition) {
-        return result(targetCondition);
+    execute(result, targetCondition, context) {
+        return result(targetCondition, context.description || 'one');
     },
 });
 
 let message = "";
 
 for (let teen = 0; teen <= 100; teen += 10) {
-    range.case(teen, (age) => {
-        message = `He is ${teen}+ (${age}) years old`;
+    range.case(teen, (age, description) => {
+        message = `The ${description} is ${teen}+ (${age}) years old`;
     });
 }
 
@@ -54,6 +71,6 @@ describe('using empty proxy', () => {
 describe('using proxy', () => {
     it('should be ok', async () => {
         await range.switch(1);
-        message.should.be.exactly('He is 0+ (1) years old');
+        message.should.be.exactly('The baby is 0+ (1) years old');
     });
 });
