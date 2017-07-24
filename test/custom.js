@@ -58,7 +58,14 @@ for (let teen = 0; teen <= 100; teen += 10) {
 
 describe('using empty proxy', () => {
     it('should be ok', async () => {
-        const switcher = new Switcher({});
+        const switcher = new Switcher({
+            validateCondition: null,
+            validateResult: null,
+            createIndex: null,
+            searchIndex: null,
+            match: null,
+            execute: null,
+        });
         switcher.case(1, () => message = 'This is 1');
         switcher.case(2, () => message = 'This is 2');
         switcher.switch(1);

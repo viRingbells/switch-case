@@ -1,6 +1,6 @@
 {
   "name": "switch-case",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "An advanced cases switcher for complex conditions",
   "main": "index.js",
   "directories": {
@@ -28,7 +28,9 @@
     "url": "https://github.com/viRingbells/switch-case/issues"
   },
   "homepage": "https://github.com/viRingbells/switch-case#readme",
-  "dependencies": {},
+  "dependencies": {
+    "extend": "^3.0.1"
+  },
   "devDependencies": {
     "eslint": "^4.2.0",
     "eslint-plugin-spellcheck": "0.0.8",

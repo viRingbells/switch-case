@@ -5,9 +5,11 @@
 
 const assert  = require('assert');
 const debug   = require('debug')('switch-case.Switcher');
+const extend  = require('extend');
 
 const BREAK = 'BREAK';
 
+let defaultProxy = null;
 let matched = false;
 let caseList = null;
 let caseResult = null;
@@ -19,7 +21,8 @@ class Switcher {
     static get BREAK() { return BREAK; }
     constructor(proxy) {
         debug('construct');
-        this.proxy = proxy || DEFAULT_PROXY;
+        defaultProxy = extend(true, {}, DEFAULT_PROXY);
+        this.proxy = extend(true, defaultProxy, proxy);
         this._caseList = [];
         this._defaultCaseList = [];
         this._indexTable = {};
