@@ -9,36 +9,28 @@ const extend  = require('extend');
 
 const BREAK = 'BREAK';
 
-let defaultProxy = null;
-let matched = false;
-let caseList = null;
-let caseResult = null;
-let caseContext = null;
-let result = null;
-let indexList = null;
-
 class Switcher {
     static get BREAK() { return BREAK; }
     constructor(proxy) {
         debug('construct');
-        defaultProxy = extend(true, {}, DEFAULT_PROXY);
+        const defaultProxy = extend(true, {}, DEFAULT_PROXY);
         this.proxy = extend(true, defaultProxy, proxy);
         this._caseList = [];
         this._defaultCaseList = [];
         this._indexTable = {};
     }
-    dispatch(targetCondition) {
-        return this.switch(targetCondition);
+    async dispatch(targetCondition) {
+        return await this.switch(targetCondition);
     }
-    switch(targetCondition) {
+    async switch(targetCondition) {
         debug('switch');
-        caseList = this._searchIndexCaseList(targetCondition)
+        let caseList = this._searchIndexCaseList(targetCondition)
             .map(({ condition, result }) => { return { condition, result, context: {}}; })
             .filter(({ condition, context }) => this._match(targetCondition, condition, context))
             .map(({ result, context }) => { return { result, context }; });
         caseList = caseList.length === 0 ?
             this._defaultCaseList.map(result => { return { result, context: {}}; }) : caseList;
-        return this._execute(targetCondition, caseList);
+        return await this._execute(targetCondition, caseList);
     }
     case(...conditions) {
         const result = conditions.pop();
@@ -84,7 +76,7 @@ class Switcher {
             return this._caseList;
         }
         const caseList = new Set();
-        indexList = this.proxy.searchIndex(targetCondition, this._indexTable);
+        let indexList = this.proxy.searchIndex(targetCondition, this._indexTable);
         if (Array.isArray(indexList)) {
             indexList.forEach(index => caseList.add(this._caseList[index]));
             return [...caseList.values()];
@@ -93,6 +85,7 @@ class Switcher {
     }
     _match(targetCondition, condition, context) {
         debug('testing match');
+        let matched = false;
         if (!(this.proxy.match instanceof Function)) {
             matched = targetCondition === condition;
         }
@@ -102,13 +95,14 @@ class Switcher {
         debug(matched ? 'matched' : 'not matched');
         return matched;
     }
-    _execute(targetCondition, caseList, index = 0) {
+    async _execute(targetCondition, caseList, index = 0) {
         if (index >= caseList.length) {
             return;
         }
         debug('executing');
-        caseResult = caseList[index].result;
-        caseContext = caseList[index].context;
+        let result = null;
+        let caseResult = caseList[index].result;
+        let caseContext = caseList[index].context;
         if (!(this.proxy.execute instanceof Function)) {
             assert(caseResult instanceof Function, 'Case action should be a function');
             result = caseResult(targetCondition);
@@ -117,17 +111,12 @@ class Switcher {
             result = this.proxy.execute(caseResult, targetCondition, caseContext);
         }
         if (result instanceof Promise) {
-            return result.then(result => {
-                if (result === Switcher.BREAK) {
-                    return;
-                }
-                return this._execute(targetCondition, caseList, index + 1);
-            });
+            result = await result;
         }
         if (result === Switcher.BREAK) {
             return;
         }
-        return this._execute(targetCondition, caseList, index + 1);
+        return (await this._execute(targetCondition, caseList, index + 1)) || result;
     }
 }
 

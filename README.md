@@ -1,8 +1,31 @@
 # switch-case
-switcher for complex conditions
+A switcher for complex and dynamic cases.
 
-[![NPM version](https://img.shields.io/npm/v/switch-case.svg)](https://www.npmjs.com/package/switch-case)
-[![Build Status](https://travis-ci.org/viRingbells/switch-case.svg?branch=master)](https://travis-ci.org/viRingbells/switch-case)
+[![NPM version][npm-image]][npm-url]
+[![build status][travis-image]][travis-url]
+[![Test coverage][coveralls-image]][coveralls-url]
+[![NPM downloads][downloads-image]][npm-url]
+[![Node.js dependencies][david-image]][david-url]
+
+## Install
+
+```
+$ npm install --save switch-case
+```
+
+## Get started
+
+Use it just like `switch case`
+
+```
+const Switcher = require('switch-case');
+const switcher = new Switcher();
+
+switcher.case(1, () => 
+
+
+
+
 
 ## How to use
 
@@ -86,3 +109,14 @@ see [lark-router](https://github.com/larkjs/lark-router)
 
 ## LICENCE
 MIT
+
+
+[npm-image]: https://img.shields.io/npm/v/switch-case.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/switch-case
+[travis-image]: https://img.shields.io/travis/viRingbells/switch-case/master.svg?style=flat-square
+[travis-url]: https://travis-ci.org/viRingbells/switch-case
+[downloads-image]: https://img.shields.io/npm/dm/switch-case.svg?style=flat-square
+[david-image]: https://img.shields.io/david/viRingbells/switch-case.svg?style=flat-square
+[david-url]: https://david-dm.org/viRingbells/switch-case
+[coveralls-image]: https://img.shields.io/codecov/c/github/viRingbells/switch-case.svg?style=flat-square
+[coveralls-url]: https://codecov.io/github/viRingbells/switch-case

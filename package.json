@@ -1,6 +1,6 @@
 {
   "name": "switch-case",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "An advanced cases switcher for complex conditions",
   "main": "index.js",
   "directories": {
@@ -9,10 +9,11 @@
   },
   "scripts": {
     "lint": "./node_modules/.bin/eslint index.js",
-    "pretest": "npm run lint && npm link && npm link switch-case",
+    "test:clear-env": "npm unlink switch-case && npm unlink && npm install",
+    "test:prepare-env": "npm link && npm link switch-case",
+    "pretest": "npm run test:clear-env && npm run lint && npm run test:prepare-env",
     "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --require should --recursive test",
-    "posttest": "npm unlink",
-    "debug": "node --inspect-brk=9229 example/simple.js"
+    "posttest": "npm run test:clear-env"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
   },
   "homepage": "https://github.com/viRingbells/switch-case#readme",
   "dependencies": {
+    "debug": "^3.1.0",
     "extend": "^3.0.1"
   },
   "devDependencies": {
