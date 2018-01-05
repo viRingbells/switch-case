@@ -21,53 +21,36 @@ Use it just like `switch case`
 const Switcher = require('switch-case');
 const switcher = new Switcher();
 
-switcher.case(1, () => 
-
-
-
-
-
-## How to use
-
-First set some cases, then switch and dispatch a certain input, like:
-
-```javascript
-const Switcher = require('switch-case');
-const switcher = new Switcher();
-
 switcher
-.case(1, () => {
-    //todo with case 1
-})
-.case(2, () => {
-    //todo with case 2
-});
+    .case(1, () => {
+        console.log(1);
+    })
+    .case(2, () => {
+        console.log(2);
+    });
 
-switcher.switch(1); // ===> print "1"
-switcher.dispatch(2); // ===> print "2"
+
+switcher.switch(1);   // ===> prints 1 on the screen
 ```
 
-## When to use switch-case
+## Why
 
-If you know every case you are going to handle, use the native statement `switch(..) { case ... }`. 
-In other cases, use this to set case automaticaly:
+For most cases the native syntax `switch case` is adequate, if you know every case well.
+But if your cases are not so clear or just dynamic during your program running time, you may need this.
 
-```javascript
-const cases = getTheRandomCases();
-cases.forEach(case => switcher.case(case.condition, case.result));
-
-switcher.dispatch(...);
-```
+For me, I use this module for a router module, which I would never want to write with native `siwtch case` syntax.
 
 ## async handlers
 
-You can set async handlers by returning a promise.
+This module supports async handlers in cases.
 
-```javascript
-switcher.case(1, () => new Promise((resolve, reject) => {
-    setTimeout(resolve, 1000);
+```
+const result = await switcher.case(1, async () => {
+    await sleep(100);
+    return 100;
 });
 ```
+
 
 ## Custom proxy
 
@@ -85,7 +68,7 @@ Checks if the target condition passed by switcher.switch matched the case condit
 
 ### proxy.execute(result, targetCondition) 
 
-Executes the result with the target condition as a param.
+Executes the result with the target condition as a param. Support both async or sync functions.
 
 ### proxy.validateCondition(condition)
 
