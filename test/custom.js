@@ -1,6 +1,7 @@
 'use strict';
 
 const assert    = require('assert');
+const should    = require('should');
 const Switcher  = require('switch-case');
 
 const range = new Switcher({
@@ -35,12 +36,16 @@ const range = new Switcher({
         return indexTable[age] || [];
     },
     validateCondition(teen) {
-        assert(Number.isInteger(teen), 'teen should be a integer');
-        assert(teen >= 0 && teen <= 120, 'teen should be in range [0, 120]');
+        if (!Number.isInteger(teen) ||
+            (teen < 0 && teen > 120)) {
+            return false;
+        }
         return true;
     },
     validateResult(result) {
-        assert(result instanceof Function, 'result should be a function');
+        if (!(result instanceof Function)) {
+            return false;
+        }
         return true;
     },
     execute(result, targetCondition, context) {
@@ -79,5 +84,35 @@ describe('using proxy', () => {
     it('should be ok', async () => {
         await range.switch(1);
         message.should.be.exactly('The baby is 0+ (1) years old');
+    });
+});
+
+describe('using bad proxy', () => {
+    it('should throw if not pass condition check', async () => {
+        const switcher = new Switcher({
+            validateCondition() { return false; }
+        });
+        let error = {};
+        try {
+            switcher.case(1, () => {});
+        }
+        catch (e) {
+            error = e;
+        }
+        error.should.be.an.instanceOf(Error);
+    });
+
+    it('should throw if not pass condition check', async () => {
+        const switcher = new Switcher({
+            validateResult() { return false; }
+        });
+        let error = {};
+        try {
+            switcher.case(1, () => {});
+        }
+        catch (e) {
+            error = e;
+        }
+        error.should.be.an.instanceOf(Error);
     });
 });

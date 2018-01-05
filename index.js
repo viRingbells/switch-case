@@ -55,13 +55,17 @@ class Switcher {
     }
     _validateCondition(condition) {
         debug('validate condition');
-        assert(!(this.proxy.validateCondition instanceof Function) || 
-            this.proxy.validateCondition(condition), 'Invalid case condition');
+        if (this.proxy.validateCondition instanceof Function &&
+            !this.proxy.validateCondition(condition)) {
+            throw new Error('Invalid case condition');
+        }
     }
     _validateResult(result) {
         debug('validate result');
-        assert(!(this.proxy.validateResult instanceof Function) || 
-            this.proxy.validateResult(result), 'Invalid case condition');
+        if (this.proxy.validateResult instanceof Function &&
+            !this.proxy.validateResult(result)) {
+            throw new Error('Invalid case condition');
+        }
     }
     _createIndex(condition, index) {
         debug('create index');
