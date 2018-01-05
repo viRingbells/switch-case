@@ -105,13 +105,10 @@ class Switcher {
         let caseContext = caseList[index].context;
         if (!(this.proxy.execute instanceof Function)) {
             assert(caseResult instanceof Function, 'Case action should be a function');
-            result = caseResult(targetCondition);
+            result = await caseResult(targetCondition);
         }
         else {
-            result = this.proxy.execute(caseResult, targetCondition, caseContext);
-        }
-        if (result instanceof Promise) {
-            result = await result;
+            result = await this.proxy.execute(caseResult, targetCondition, caseContext);
         }
         if (result === Switcher.BREAK) {
             return;
