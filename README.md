@@ -1,3 +1,7 @@
+# IMPORTANT
+This package is not maintained any more.
+See https://github.com/OmgImAlexis/switch-case for an alternative please (thanks to @omgimalexis)
+
 # switch-case
 A switcher for complex and dynamic cases.
 
